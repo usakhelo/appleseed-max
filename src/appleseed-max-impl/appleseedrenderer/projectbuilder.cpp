@@ -427,10 +427,26 @@ namespace
     {
         // Retrieve the geometrical object referenced by this node.
         Object* object = object_node->GetObjectRef();
+        IAppleseedGeometricObject* appleseed_geo_object(nullptr);
+
+        // Go down the modifier stack
+        while (object->SuperClassID() == GEN_DERIVOB_CLASS_ID && object != nullptr)
+        {
+            IDerivedObject* derived_object = static_cast<IDerivedObject*>(object);
+
+            object = derived_object->GetObjRef();
+
+            appleseed_geo_object =
+                static_cast<IAppleseedGeometricObject*>(object->GetInterface(IAppleseedGeometricObject::interface_id()));
+
+            if (appleseed_geo_object != nullptr)
+                break;
+        }
 
         // Check if this object is defined by an appleseed-max plugin.
-        auto appleseed_geo_object =
-            static_cast<IAppleseedGeometricObject*>(object->GetInterface(IAppleseedGeometricObject::interface_id()));
+        if (appleseed_geo_object == nullptr)
+            appleseed_geo_object = 
+                static_cast<IAppleseedGeometricObject*>(object->GetInterface(IAppleseedGeometricObject::interface_id()));
 
         if (appleseed_geo_object)
         {
