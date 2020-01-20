@@ -67,6 +67,8 @@ class AppleseedObjPropsMod
     int NumParamBlocks() override;
     IParamBlock2* GetParamBlock(int i) override;
     IParamBlock2* GetParamBlockByID(BlockID id) override;
+    void* GetInterface(ULONG id) override;
+    BaseInterface* GetInterface(Interface_ID id) override;
 
     // ReferenceMaker methods.
     int NumRefs() override;
