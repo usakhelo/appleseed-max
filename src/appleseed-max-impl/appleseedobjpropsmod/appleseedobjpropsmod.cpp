@@ -34,9 +34,6 @@
 #include "main.h"
 #include "utilities.h"
 
-// appleseed-max-common headers.
-#include "appleseed-max-common/iappleseedgeometricobject.h"
-
 // 3ds Max headers.
 #include "appleseed-max-common/_beginmaxheaders.h"
 #include <modstack.h>
@@ -377,54 +374,6 @@ int AppleseedObjPropsMod::get_medium_priority(const TimeValue t) const
 float AppleseedObjPropsMod::get_shadow_terminator_correction(const TimeValue t) const
 {
     return m_pblock->GetFloat(ParamIdShadowTerminatorCorrection, t, FOREVER);
-}
-
-void* AppleseedObjPropsMod::GetInterface(ULONG id)
-{
-    return OSModifier::GetInterface(id);
-}
-
-class AppleseedObjPropsModEnumProc : public ModContextEnumProc {
-
-  public:
-    AppleseedObjPropsMod* modifier;
-    IAppleseedGeometricObject* appleseed_geo_object;
-
-    AppleseedObjPropsModEnumProc(AppleseedObjPropsMod* mod)
-      : modifier(mod)
-      , appleseed_geo_object(nullptr)
-    {
-    }
-
-    BOOL proc(ModContext *mc) override
-    {
-        //if (mc->localData == nullptr)
-        //    return true;
-
-        IDerivedObject* derived_obj;
-        int mod_index;
-        modifier->GetIDerivedObject(mc, derived_obj, mod_index);
-        if (appleseed_geo_object == nullptr)
-        {
-            IAppleseedGeometricObject* appleseed_geo_object =
-                static_cast<IAppleseedGeometricObject*>(derived_obj->GetInterface(IAppleseedGeometricObject::interface_id()));
-        }
-        return true;
-    }
-};
-
-BaseInterface* AppleseedObjPropsMod::GetInterface(Interface_ID id)
-{
-    if (id == IAppleseedGeometricObject::interface_id())
-    {
-        AppleseedObjPropsModEnumProc mod_enum_proc(this);
-        EnumModContexts(&mod_enum_proc);
-
-        if (mod_enum_proc.appleseed_geo_object != nullptr)
-            return mod_enum_proc.appleseed_geo_object;
-    }
-    
-    return OSModifier::GetInterface(id);
 }
 
 
